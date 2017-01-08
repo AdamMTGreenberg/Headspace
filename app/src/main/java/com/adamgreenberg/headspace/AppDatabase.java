@@ -1,0 +1,14 @@
+package com.adamgreenberg.headspace;
+
+import com.raizlabs.android.dbflow.annotation.Database;
+
+/**
+ * Created by adamgreenberg on 1/8/17.
+ */
+@Database(name = AppDatabase.NAME, version = AppDatabase.VERSION)
+public class AppDatabase {
+
+    public static final String NAME = "AppDatabase"; // we will add the .db extension
+
+    public static final int VERSION = 1;
+}
