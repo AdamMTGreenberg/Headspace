@@ -10,7 +10,7 @@ import com.raizlabs.android.dbflow.config.FlowManager;
  */
 
 public class HeadspaceApplication extends Application {
-    
+
     @Override
     public void onCreate() {
         super.onCreate();

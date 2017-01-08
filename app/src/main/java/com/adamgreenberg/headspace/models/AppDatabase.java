@@ -1,4 +1,4 @@
-package com.adamgreenberg.headspace;
+package com.adamgreenberg.headspace.models;
 
 import com.raizlabs.android.dbflow.annotation.Database;
 
