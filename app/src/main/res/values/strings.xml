@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Headspace</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="add_column">Add Column</string>
+    <string name="edit_cell">Edit Cell</string>
+    <string name="add_row">Add Row</string>
+</resources>
