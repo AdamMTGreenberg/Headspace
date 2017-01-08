@@ -7,21 +7,18 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 
 /**
  * Created by adamgreenberg on 1/8/17.
+ * Class that backs the spreadsheet info allowing us to adjust appropriately.
  */
 @Table(database = AppDatabase.class)
-public class ColumnStore extends BaseModel {
+public class SpreadsheetInfo extends BaseModel {
 
     @PrimaryKey(autoincrement = true)
     long id;
 
     @Column
-    long mRowId
+    public int mRowCount;
 
     @Column
-    int mColumnId;
-
-    @Column
-    String mData;
-
-
+    public int mColumnCount;
+    
 }
