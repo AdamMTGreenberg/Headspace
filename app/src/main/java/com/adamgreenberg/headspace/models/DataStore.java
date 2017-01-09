@@ -24,4 +24,16 @@ public class DataStore extends BaseModel {
 
     @Column
     public String mData;
+
+    /**
+     * {@code 0} represents that the data isn't saved, {@code 1} represents that it has been saved.
+     */
+    @Column(defaultValue = "0")
+    public int mIsSaved;
+
+    /**
+     * {@code 0} represents that the data isn't showing, {@code 1} represents that it is showing.
+     */
+    @Column(defaultValue = "1")
+    public int mIsShowing;
 }
