@@ -98,16 +98,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onFabClicked() {
-        // TODO Show interstitial blocking UI
-        // Load the table info
-        final SpreadsheetInfo info = getInfo();
-        // Update the table info in memory
-        mRows = info.mRowCount;
-        mColumns = info.mColumnCount;
-
-        // Load the data with saved = 1
-        // Update table on load
-        reloadSpreadsheetData();
+       // TODO
     }
 
     @Override
@@ -159,6 +150,20 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
         // Cycle through all records and update
         updateAndSaveRecords();
+    }
+
+    @Override
+    public void onReloadClicked() {
+        // TODO Show interstitial blocking UI
+        // Load the table info
+        final SpreadsheetInfo info = getInfo();
+        // Update the table info in memory
+        mRows = info.mRowCount;
+        mColumns = info.mColumnCount;
+
+        // Load the data with saved = 1
+        // Update table on load
+        reloadSpreadsheetData();
     }
 
     @Override
