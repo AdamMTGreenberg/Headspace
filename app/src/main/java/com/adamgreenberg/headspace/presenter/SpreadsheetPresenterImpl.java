@@ -141,13 +141,17 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     @Override
     public void onSaveClicked() {
         // TODO Show interstitial blocking UI
+        // Update the table params
+        updateSpreadsheetParams();
+
         // Cycle through all records and update
         updateAndSaveRecords();
     }
 
     @Override
     public void onReloadClicked() {
-// TODO
+        // TODO Show interstitial blocking UI
+        // Load data that is marked as saved
     }
 
     @Override
@@ -210,6 +214,15 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         }
 
         return info;
+    }
+
+    private void updateSpreadsheetParams() {
+        SpreadsheetInfo info = getInfo();
+        info.mColumnCount = mColumns;
+        info.mColumnCountSaved = mColumns;
+        info.mRowCount = mRows;
+        info.mRowCountSaved = mRows;
+        info.update();
     }
 
     private void getSpreadsheetData() {
