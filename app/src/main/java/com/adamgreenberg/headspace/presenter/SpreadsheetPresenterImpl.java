@@ -1,19 +1,18 @@
 package com.adamgreenberg.headspace.presenter;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 
-import com.adamgreenberg.headspace.models.DataStore;
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
-import com.adamgreenberg.headspace.models.DataStore_Table;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
 import com.adamgreenberg.headspace.ui.SpreadsheetView;
-import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Observer;
+import rx.Subscription;
+import timber.log.Timber;
 
 /**
  * Created by adamgreenberg on 1/8/17.
@@ -43,6 +42,11 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
      */
     private DataStoreQueryTransaction mDst;
 
+    /**
+     * Subscription to the DB helper object
+     */
+    private Subscription mSubscription;
+
     public SpreadsheetPresenterImpl(final SpreadsheetView mainActivity) {
         mView = mainActivity;
         mAdapter = new SpreadsheetAdapter();
@@ -65,7 +69,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
 
     @Override
     public void destroyed() {
-        // TODO close any DB connections
+        if (mSubscription != null && !mSubscription.isUnsubscribed()) {
+            mSubscription.unsubscribe();
+        }
     }
 
     @Override
@@ -142,8 +148,29 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
         return info;
     }
 
-    public void getSpreadsheetData() {
-
+    private void getSpreadsheetData() {
+        mSubscription = mDst.register(sqlDataObserver);
+        mDst.queryData(mRows, mColumns);
     }
+
+    /**
+     * Spreadsheet data observer
+     */
+    private Observer<List<List<String>>> sqlDataObserver = new Observer<List<List<String>>>(){
+
+        @Override
+        public void onCompleted() {
+        }
+
+        @Override
+        public void onError(final Throwable e) {
+            Timber.d(e, "Error fetching spreadsheet");
+        }
+
+        @Override
+        public void onNext(final List<List<String>> lists) {
+            mAdapter.setData(lists);
+        }
+    };
 }
 
