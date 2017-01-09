@@ -45,7 +45,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ButterKnife.bind(this);
 
         mPresenter = new SpreadsheetPresenterImpl(this);
+        mPresenter.created(savedInstanceState);
         initSpreadSheetUi();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.destroyed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPresenter.paused();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPresenter.resumed();
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        mPresenter.saveInstance(outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override

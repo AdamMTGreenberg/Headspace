@@ -2,11 +2,11 @@ package com.adamgreenberg.headspace.presenter;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
 import com.adamgreenberg.headspace.models.FixedGridLayoutManager;
+import com.adamgreenberg.headspace.models.OnCellClickedListener;
 import com.adamgreenberg.headspace.models.Spreadsheet;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
 import com.adamgreenberg.headspace.ui.GridDividerDecoration;
@@ -24,7 +24,7 @@ import timber.log.Timber;
  * Presenter implementation. Contains all business logic.
  */
 
-public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
+public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellClickedListener {
 
     private static final int DEFAULT_COUNT = Spreadsheet.MIN_ROWS;
 
@@ -54,6 +54,12 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
      */
     private Subscription mSubscription;
 
+    /**
+     * Reference for the active input cell
+     */
+    private int mInputRow = 0;
+    private int mInputCol = 0;
+
     public SpreadsheetPresenterImpl(final SpreadsheetView mainActivity) {
         mView = mainActivity;
         mAdapter = new SpreadsheetAdapter();
@@ -63,7 +69,6 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
     @Override
     public void created(final Bundle savedInstanceState) {
         populateData();
-        populateAdapter();
     }
 
     @Override
@@ -135,11 +140,13 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
     }
 
     @Override
-    public void saveInstance(final Bundle outState) {
+    public void onCellClicked(final int row, final int col) {
+        mInputRow = row;
+        mInputCol = col;
     }
 
-    private void populateAdapter() {
-
+    @Override
+    public void saveInstance(final Bundle outState) {
     }
 
     private void populateData() {
