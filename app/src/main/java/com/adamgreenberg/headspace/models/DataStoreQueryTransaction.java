@@ -82,13 +82,14 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                                     column.add(null);
                                 }
                             }
+                            rowList.add(column);
                         }
 
                         return rowList;
                     }
                 })
-                .observeOn(Schedulers.newThread())
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<List<List<String>>>() {
 
                     @Override

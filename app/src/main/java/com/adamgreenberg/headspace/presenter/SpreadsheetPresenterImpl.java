@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.adamgreenberg.headspace.models.DataStore;
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
+import com.adamgreenberg.headspace.models.DataStore_Table;
 import com.adamgreenberg.headspace.models.FixedGridLayoutManager;
 import com.adamgreenberg.headspace.models.OnCellClickedListener;
 import com.adamgreenberg.headspace.models.Spreadsheet;
@@ -187,7 +188,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     }
 
     private void initSpreadsheetCheck() {
-        final long count = SQLite.select()
+        final long count = SQLite.selectCountOf(DataStore_Table.mID)
                 .from(DataStore.class)
                 .count();
 
