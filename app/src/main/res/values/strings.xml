@@ -8,4 +8,7 @@
     <string name="add_column">Add Column</string>
     <string name="edit_cell">Edit Cell</string>
     <string name="add_row">Add Row</string>
+    <string name="save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="reload">Reload</string>
 </resources>
