@@ -21,4 +21,10 @@ public class SpreadsheetInfo extends BaseModel {
     @Column
     public int mColumnCount;
 
+    @Column
+    public int mRowCountSaved;
+
+    @Column
+    public int mColumnCountSaved;
+
 }
