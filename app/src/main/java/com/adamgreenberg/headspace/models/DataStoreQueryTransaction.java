@@ -1,8 +1,6 @@
 package com.adamgreenberg.headspace.models;
 
 import android.support.annotation.NonNull;
-import android.support.v4.text.TextUtilsCompat;
-import android.text.TextUtils;
 
 import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -46,6 +44,19 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
         mSaveDataObservable = null;
         SQLite.select()
                 .from(DataStore.class)
+                .orderBy(DataStore_Table.mRow, true)
+                .orderBy(DataStore_Table.mColumn, true)
+                .async()
+                .queryResultCallback(this)
+                .execute();
+    }
+
+    public void querySavedData(final int rows, final int columns) {
+        mBoundsObservable = Observable.just(new int[]{rows, columns});
+        mSaveDataObservable = null;
+        SQLite.select()
+                .from(DataStore.class)
+                .where(DataStore_Table.mIsSaved.eq(1))
                 .orderBy(DataStore_Table.mRow, true)
                 .orderBy(DataStore_Table.mColumn, true)
                 .async()
@@ -107,7 +118,6 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                     public void onNext(final List<List<String>> arrayLists) {
                         mSubject.onNext(arrayLists);
                     }
-
                 });
     }
 

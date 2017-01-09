@@ -73,7 +73,11 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void created(final Bundle savedInstanceState) {
-        populateData();
+        if (savedInstanceState != null) {
+            populateData();
+        } else {
+            restoreData(savedInstanceState);
+        }
     }
 
     @Override
@@ -94,7 +98,16 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onFabClicked() {
-// TODO undo
+        // TODO Show interstitial blocking UI
+        // Load the table info
+        final SpreadsheetInfo info = getInfo();
+        // Update the table info in memory
+        mRows = info.mRowCount;
+        mColumns = info.mColumnCount;
+
+        // Load the data with saved = 1
+        // Update table on load
+        reloadSpreadsheetData();
     }
 
     @Override
@@ -146,12 +159,6 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
         // Cycle through all records and update
         updateAndSaveRecords();
-    }
-
-    @Override
-    public void onReloadClicked() {
-        // TODO Show interstitial blocking UI
-        // Load data that is marked as saved
     }
 
     @Override
@@ -225,6 +232,10 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         info.update();
     }
 
+    private void reloadSpreadsheetData() {
+        mDst.querySavedData(mRows, mColumns);
+    }
+
     private void getSpreadsheetData() {
         initSpreadsheetCheck();
         mSubscription = mDst.register(sqlDataObserver);
@@ -281,6 +292,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
                     final DataStore ds = new DataStore();
                     ds.mColumn = c;
                     ds.mRow = r;
+                    ds.mIsSaved = 1;
                     ds.save();
                 }
             }

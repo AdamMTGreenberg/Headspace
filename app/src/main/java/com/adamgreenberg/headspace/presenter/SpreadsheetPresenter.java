@@ -64,11 +64,6 @@ public interface SpreadsheetPresenter {
     void onSaveClicked();
 
     /**
-     * On the instance that the reload button is clicked
-     */
-    void onReloadClicked();
-
-    /**
      * On the instance that the clear button is clicked
      */
     void onClearClicked();
