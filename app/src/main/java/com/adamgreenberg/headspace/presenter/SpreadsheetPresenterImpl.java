@@ -81,7 +81,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void created(final Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
+        if (savedInstanceState == null) {
             populateData();
         } else {
             restoreData(savedInstanceState);
