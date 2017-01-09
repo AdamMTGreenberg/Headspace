@@ -3,6 +3,7 @@ package com.adamgreenberg.headspace.presenter;
 import android.os.Bundle;
 
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
+import com.adamgreenberg.headspace.models.Spreadsheet;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
 import com.adamgreenberg.headspace.ui.SpreadsheetView;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -21,7 +22,7 @@ import timber.log.Timber;
 
 public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
 
-    private static final int DEFAULT_COUNT = 8;
+    private static final int DEFAULT_COUNT = Spreadsheet.MIN_ROWS;
 
     private final SpreadsheetView mView;
     private final SpreadsheetAdapter mAdapter;
@@ -35,7 +36,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
     /**
      * We use this so we can dynamically control the data backing the spreadsheet.
      */
-    private ArrayList<ArrayList<String>> mData;
+    private List<List<String>> mData;
 
     /**
      * SQL async helper
@@ -111,12 +112,11 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
 
     @Override
     public SpreadsheetAdapter getAdapter() {
-        return null; // TODO
+        return mAdapter;
     }
 
     @Override
     public void saveInstance(final Bundle outState) {
-// TODO
     }
 
     private void populateAdapter() {
@@ -156,7 +156,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
     /**
      * Spreadsheet data observer
      */
-    private Observer<List<List<String>>> sqlDataObserver = new Observer<List<List<String>>>(){
+    private Observer<List<List<String>>> sqlDataObserver = new Observer<List<List<String>>>() {
 
         @Override
         public void onCompleted() {
@@ -169,7 +169,8 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
 
         @Override
         public void onNext(final List<List<String>> lists) {
-            mAdapter.setData(lists);
+            mData = lists;
+            mAdapter.setData(mData);
         }
     };
 }
