@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
+import com.adamgreenberg.headspace.models.DataStore;
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
 import com.adamgreenberg.headspace.models.FixedGridLayoutManager;
 import com.adamgreenberg.headspace.models.OnCellClickedListener;
@@ -180,8 +181,27 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     }
 
     private void getSpreadsheetData() {
+        initSpreadsheetCheck();
         mSubscription = mDst.register(sqlDataObserver);
         mDst.queryData(mRows, mColumns);
+    }
+
+    private void initSpreadsheetCheck() {
+        final long count = SQLite.select()
+                .from(DataStore.class)
+                .count();
+
+        if (count < Spreadsheet.MIN_COLUMNS * Spreadsheet.MIN_ROWS) {
+            // Initialize with empty data
+            for (int r = 0; r < Spreadsheet.MIN_ROWS; r++) {
+                for (int c = 0; c < Spreadsheet.MIN_COLUMNS ; c++) {
+                    final DataStore ds = new DataStore();
+                    ds.mColumn = c;
+                    ds.mRow = r;
+                    ds.save();
+                }
+            }
+        }
     }
 
     /**
