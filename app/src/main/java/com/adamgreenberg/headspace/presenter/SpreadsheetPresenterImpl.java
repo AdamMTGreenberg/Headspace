@@ -116,6 +116,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         addNullColumn();
 
         // Set the column value increased on the adapter
+        mGridLayoutManager.setTotalColumnCount(mColumns);
         mAdapter.setColumnSpan(mColumns);
 
         // Notify the undo stack of a column add

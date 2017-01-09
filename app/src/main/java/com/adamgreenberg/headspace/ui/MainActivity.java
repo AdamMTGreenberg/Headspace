@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.adamgreenberg.headspace.R;
 import com.adamgreenberg.headspace.presenter.SpreadsheetPresenter;
@@ -30,6 +29,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
@@ -133,6 +133,16 @@ public class MainActivity extends AppCompatActivity
         editCell.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(editCell, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    @OnClick(R.id.add_column)
+    void onAddColumnClicked() {
+        mPresenter.onAddColumnClicked();
+    }
+
+    @OnClick(R.id.add_row)
+    void onAddRowClicked() {
+        mPresenter.onAddRowClicked();
     }
 
     private void initSpreadSheetUi() {
