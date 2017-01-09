@@ -30,4 +30,7 @@ public class TransactionHistory extends BaseModel {
     @Column
     public boolean mWasRowAdd = false;
 
+    @Column
+    public boolean mWasClear = false;
+
 }
