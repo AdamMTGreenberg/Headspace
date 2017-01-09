@@ -33,4 +33,7 @@ public class TransactionHistory extends BaseModel {
     @Column
     public boolean mWasClear = false;
 
+    @Column
+    public long mClearTime = -1L;
+
 }

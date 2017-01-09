@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
+import com.adamgreenberg.headspace.models.ClearStackTable;
 import com.adamgreenberg.headspace.models.DataStore;
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
 import com.adamgreenberg.headspace.models.DataStore_Table;
@@ -20,8 +21,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func0;
+import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -58,6 +64,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
      * Subscription to the DB helper object
      */
     private Subscription mSubscription;
+    private Subscription mClearSubscription;
 
     /**
      * Reference for the active input cell
@@ -92,6 +99,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     public void destroyed() {
         if (mSubscription != null && !mSubscription.isUnsubscribed()) {
             mSubscription.unsubscribe();
+        }
+        if (mClearSubscription != null && !mClearSubscription.isUnsubscribed()) {
+            mClearSubscription.unsubscribe();
         }
         mAdapter.unregisterOnCellClickedListener();
     }
@@ -169,16 +179,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onClearClicked() {
-        final List<List<String>> tempData = new ArrayList<>(mRows);
-        for(int i = 0; i < mRows; i++) {
-            final List<String> tempCol = new ArrayList<>(mColumns);
-            for (int x = 0; x < mColumns; x++) {
-                tempCol.add(null);
-            }
-        }
-        setData(tempData);
-
-        addClearToUndoStack();
+        mClearSubscription = addToClearStack(mData);
     }
 
     @Override
@@ -272,11 +273,60 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         history.save();
     }
 
-
-    private void addClearToUndoStack() {
+    private void addClearToUndoStack(final Long time) {
         final TransactionHistory history = new TransactionHistory();
         history.mWasClear = true;
+        history.mClearTime  = time;
         history.save();
+    }
+
+    private Subscription addToClearStack(final List<List<String>> data) {
+        return Observable.just(data)
+                .zipWith(
+                        Observable.defer(new Func0<Observable<Long>>() {
+                            @SuppressWarnings("unchecked")
+                            @Override
+                            public Observable<Long> call() {
+                                return Observable.just(System.currentTimeMillis()); // For non production app, OK to assume non edge cases
+                            }
+                        }),
+                        new Func2<List<List<String>>, Long,  List<List<String>>>() {
+                            @Override
+                            public  List<List<String>> call(final List<List<String>> lists, final Long time) {
+                                int row = 0;
+                                // Add all the data to a stored table
+                                for (final List<String> rows : lists) {
+                                    int col = 0;
+                                    for (final String columnData : rows) {
+                                        final ClearStackTable clearStackTable = new ClearStackTable();
+                                        clearStackTable.mClearTime = time;
+                                        clearStackTable.mRow = row;
+                                        clearStackTable.mColumn = col;
+                                        clearStackTable.mData = columnData;
+                                        clearStackTable.save();
+
+                                        col++;
+                                    }
+                                    row++;
+                                }
+
+                                // Create an empty list of data for backing the spreadsheet
+                                final List<List<String>> tempData = new ArrayList<>(mRows);
+                                for(int i = 0; i < mRows; i++) {
+                                    final List<String> tempCol = new ArrayList<>(mColumns);
+                                    for (int x = 0; x < mColumns; x++) {
+                                        tempCol.add(null);
+                                    }
+                                }
+
+                                addClearToUndoStack(time);
+                                return tempData;
+                            }
+                        }
+                )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(sqlDataObserver);
     }
 
     private void addNullColumn() {
