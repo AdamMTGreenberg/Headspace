@@ -7,5 +7,8 @@ package com.adamgreenberg.headspace.ui;
 
 public interface SpreadsheetView {
 
-
+    /**
+     * Notifies the view that a cell is clicked for editing
+     */
+    void notifyCellClicked();
 }

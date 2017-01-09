@@ -84,6 +84,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         if (mSubscription != null && !mSubscription.isUnsubscribed()) {
             mSubscription.unsubscribe();
         }
+        mAdapter.unregisterOnCellClickedListener();
     }
 
     @Override
@@ -123,6 +124,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public SpreadsheetAdapter getAdapter() {
+        mAdapter.registerOnCellClickedListener(this);
         return mAdapter;
     }
 
@@ -143,6 +145,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     public void onCellClicked(final int row, final int col) {
         mInputRow = row;
         mInputCol = col;
+
+        mView.notifyCellClicked();
+        Timber.v("Cell: " + row + " x " + col + " clicked.");
     }
 
     @Override

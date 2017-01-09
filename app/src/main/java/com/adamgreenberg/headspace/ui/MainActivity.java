@@ -1,5 +1,6 @@
 package com.adamgreenberg.headspace.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -21,8 +23,10 @@ import com.adamgreenberg.headspace.presenter.SpreadsheetPresenterImpl;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SpreadsheetView {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, SpreadsheetView {
 
     @BindView(R.id.spreadsheet)
     RecyclerView mSpreadsheet;
@@ -108,6 +112,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @Override
+    public void notifyCellClicked() {
+        Timber.v("notifyCellClicked()");
+        editCell.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editCell, InputMethodManager.SHOW_IMPLICIT);
+    }
+
     private void initSpreadSheetUi() {
         // Auto generated
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -139,4 +151,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mSpreadsheet.setLayoutManager(mPresenter.getGridLayoutManager(this));
         mSpreadsheet.addItemDecoration(mPresenter.getItemDecoration(this));
     }
+
 }

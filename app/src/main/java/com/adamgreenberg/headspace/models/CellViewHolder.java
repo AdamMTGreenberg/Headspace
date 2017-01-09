@@ -2,7 +2,7 @@ package com.adamgreenberg.headspace.models;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.TextView;
 
 import com.adamgreenberg.headspace.R;
 
@@ -12,10 +12,10 @@ import com.adamgreenberg.headspace.R;
 
 public class CellViewHolder extends RecyclerView.ViewHolder {
 
-    public EditText data;
+    public TextView data;
 
     public CellViewHolder(final View itemView) {
         super(itemView);
-        data = (EditText) itemView.findViewById(R.id.cell);
+        data = (TextView) itemView.findViewById(R.id.cell);
     }
 }

@@ -40,14 +40,16 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
     @Override
     public void onBindViewHolder(final CellViewHolder holder, final int position) {
-        if (!mData.isEmpty()) {
-            final int row = (int) (position / mColumnSpan);
-            final int col = position % mColumnSpan;
+        final int row = (int) (position / mColumnSpan);
+        final int col = position % mColumnSpan;
 
+        holder.data.setClickable(true);
+        holder.data.setFocusable(true);
+        holder.data.setOnClickListener(new CellClickListener(row, col));
+
+        if (!mData.isEmpty()) {
             final String data = mData.get(row).get(col);
             holder.data.setText(data);
-
-            holder.data.setOnClickListener(new CellClickListener(row, col));
         }
     }
 
@@ -65,7 +67,7 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
     }
 
     public void setRowSpan(final int span) {
-        if(mRowSpan != span) {
+        if (mRowSpan != span) {
             final int count = getItemCount();
             mRowSpan = span;
             notifyItemRangeInserted(count - 1, mColumnSpan);
@@ -100,7 +102,6 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
         @Override
         public void onClick(final View v) {
-            v.clearFocus();
             if (mOnCellClickedListener != null) {
                 mOnCellClickedListener.onCellClicked(row, col);
             }
