@@ -365,7 +365,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         final Iterator<List<String>> iter = mData.iterator();
         while (iter.hasNext()) {
             final List<String> col = iter.next();
-            col.remove(mColumns);
+            col.remove(mColumns - 1);
         }
         mColumns--;
     }
@@ -376,7 +376,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     }
 
     private void resetRow(final int rowAddedIndex) {
-        mData.remove(mRows);
+        mData.remove(mRows - 1);
         mRows--;
         mAdapter.setRowSpan(mRows);
     }

@@ -68,6 +68,7 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
     public void setRowSpan(final int span) {
         if (mRowSpan != span) {
+            // TODO scroll up 100dp if decrement
             final int count = getItemCount();
             mRowSpan = span;
             notifyItemRangeInserted(count - 1, mColumnSpan);
@@ -76,6 +77,7 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
     public void setColumnSpan(final int span) {
         if (span != mColumnSpan) {
+            // TODO scroll left 100dp if decrement
             mColumnSpan = span;
             notifyDataSetChanged();
         }

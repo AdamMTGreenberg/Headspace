@@ -1,7 +1,6 @@
 package com.adamgreenberg.headspace.ui;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -22,10 +21,6 @@ import android.widget.EditText;
 import com.adamgreenberg.headspace.R;
 import com.adamgreenberg.headspace.presenter.SpreadsheetPresenter;
 import com.adamgreenberg.headspace.presenter.SpreadsheetPresenterImpl;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -146,8 +141,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+               mPresenter.onFabClicked();
             }
         });
 
