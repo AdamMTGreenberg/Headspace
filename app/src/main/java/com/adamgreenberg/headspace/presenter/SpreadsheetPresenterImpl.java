@@ -163,7 +163,14 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onClearClicked() {
-// TODO
+        final List<List<String>> tempData = new ArrayList<>(mRows);
+        for(int i = 0; i < mRows; i++) {
+            final List<String> tempCol = new ArrayList<>(mColumns);
+            for (int x = 0; x < mColumns; x++) {
+                tempCol.add(null);
+            }
+        }
+        setData(tempData);
     }
 
     @Override
@@ -196,6 +203,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void saveInstance(final Bundle outState) {
+        // TODO save the current data in memory
     }
 
     private void populateData() {
@@ -280,6 +288,10 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         history.save();
     }
 
+    private void restoreData(final Bundle savedInstanceState) {
+        // TODO
+    }
+
     private void initSpreadsheetCheck() {
         final long count = SQLite.selectCountOf(DataStore_Table.mID)
                 .from(DataStore.class)
@@ -299,6 +311,13 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         }
     }
 
+    private void setData(final List<List<String>> lists) {
+        mData = lists;
+        mAdapter.setRowSpan(mRows);
+        mAdapter.setColumnSpan(mColumns);
+        mAdapter.setData(mData);
+    }
+
     /**
      * Spreadsheet data observer
      */
@@ -315,10 +334,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
         @Override
         public void onNext(final List<List<String>> lists) {
-            mData = lists;
-            mAdapter.setRowSpan(mRows);
-            mAdapter.setColumnSpan(mColumns);
-            mAdapter.setData(mData);
+            setData(lists);
         }
     };
 }
