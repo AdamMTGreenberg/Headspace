@@ -14,7 +14,7 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 public class DataStore extends BaseModel {
 
     @PrimaryKey(autoincrement = true)
-    long mID;
+    public long mID;
 
     @Column
     public int mRow;

@@ -7,18 +7,21 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 
 /**
  * Created by adamgreenberg on 1/8/17.
- * Class that backs the spreadsheet info allowing us to adjust appropriately.
+ * POJO that models the transaction history of the spreadsheet.
  */
 @Table(database = AppDatabase.class)
-public class SpreadsheetInfo extends BaseModel {
+public class TransactionHistory extends BaseModel {
 
     @PrimaryKey(autoincrement = true)
     public long id;
 
     @Column
-    public int mRowCount;
+    public int mRow;
 
     @Column
-    public int mColumnCount;
+    public int mColumn;
+
+    @Column
+    public String mOldData;
 
 }
