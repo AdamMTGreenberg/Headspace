@@ -1,14 +1,17 @@
 package com.adamgreenberg.headspace.presenter;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
 import com.adamgreenberg.headspace.models.Spreadsheet;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
+import com.adamgreenberg.headspace.ui.GridDividerDecoration;
 import com.adamgreenberg.headspace.ui.SpreadsheetView;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observer;
@@ -26,12 +29,14 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
 
     private final SpreadsheetView mView;
     private final SpreadsheetAdapter mAdapter;
+    private GridLayoutManager mGridLayoutManager;
+    private RecyclerView.ItemDecoration mItemDecoration;
 
     /**
      * DB constraints
      */
-    private int mRows;
-    private int mColumns;
+    private int mRows = Spreadsheet.MIN_ROWS;
+    private int mColumns = Spreadsheet.MIN_COLUMNS;
 
     /**
      * We use this so we can dynamically control the data backing the spreadsheet.
@@ -113,6 +118,18 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
     @Override
     public SpreadsheetAdapter getAdapter() {
         return mAdapter;
+    }
+
+    @Override
+    public GridLayoutManager getGridLayoutManager(final Context ctx) {
+        mGridLayoutManager = new GridLayoutManager(ctx, mColumns);
+        return mGridLayoutManager;
+    }
+
+    @Override
+    public RecyclerView.ItemDecoration getItemDecoration(final Context ctx) {
+        mItemDecoration = new GridDividerDecoration(ctx);
+        return mItemDecoration;
     }
 
     @Override
