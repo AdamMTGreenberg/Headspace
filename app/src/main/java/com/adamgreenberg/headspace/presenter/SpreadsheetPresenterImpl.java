@@ -140,7 +140,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onSaveClicked() {
-// TODO
+        // TODO Show interstitial blocking UI
+        // Cycle through all records and update
+        updateAndSaveRecords();
     }
 
     @Override
@@ -214,6 +216,10 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         initSpreadsheetCheck();
         mSubscription = mDst.register(sqlDataObserver);
         mDst.queryData(mRows, mColumns);
+    }
+
+    private void updateAndSaveRecords() {
+        mDst.save(mData, mRows, mColumns);
     }
 
     private void addToUndoStack(final boolean isRowAdd) {
