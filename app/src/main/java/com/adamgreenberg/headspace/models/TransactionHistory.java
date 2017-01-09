@@ -25,10 +25,10 @@ public class TransactionHistory extends BaseModel {
     public String mOldData;
 
     @Column
-    public boolean mWasColumnAdd = false;
+    public int mColumnAdded = -1;
 
     @Column
-    public boolean mWasRowAdd = false;
+    public int mRowAdded = -1;
 
     @Column
     public boolean mWasClear = false;

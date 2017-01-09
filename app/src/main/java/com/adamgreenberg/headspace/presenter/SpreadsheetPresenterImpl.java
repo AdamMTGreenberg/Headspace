@@ -98,7 +98,8 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onFabClicked() {
-       // TODO
+       // TODO read in the last action
+
     }
 
     @Override
@@ -176,6 +177,8 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
             }
         }
         setData(tempData);
+
+        addClearToUndoStack();
     }
 
     @Override
@@ -262,10 +265,17 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     private void addToUndoStack(final boolean isRowAdd) {
         final TransactionHistory history = new TransactionHistory();
         if (isRowAdd) {
-            history.mWasRowAdd = true;
+            history.mRowAdded = mRows;
         } else {
-            history.mWasColumnAdd = true;
+            history.mColumnAdded = mColumns;
         }
+        history.save();
+    }
+
+
+    private void addClearToUndoStack() {
+        final TransactionHistory history = new TransactionHistory();
+        history.mWasClear = true;
         history.save();
     }
 
