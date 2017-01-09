@@ -91,6 +91,11 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void dataChanged(final int row, final int col) {
+        final int position = row * mColumnSpan + col;
+        notifyItemChanged(position);
+    }
+
     private class CellClickListener implements View.OnClickListener {
         final int row;
         final int col;

@@ -11,6 +11,7 @@ import com.adamgreenberg.headspace.models.FixedGridLayoutManager;
 import com.adamgreenberg.headspace.models.OnCellClickedListener;
 import com.adamgreenberg.headspace.models.Spreadsheet;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
+import com.adamgreenberg.headspace.models.TransactionHistory;
 import com.adamgreenberg.headspace.ui.GridDividerDecoration;
 import com.adamgreenberg.headspace.ui.SpreadsheetView;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -91,12 +92,17 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onFabClicked() {
-// TODO
+// TODO undo
     }
 
     @Override
     public void textEntered(final String dataEntered) {
-// TODO
+        // Modify the result in memory
+        final String oldData = mData.get(mInputRow).set(mInputCol, dataEntered);
+        // Add to the undo stack
+        addToUndoStack(oldData, mInputRow, mInputCol);
+        // Update the view
+        mAdapter.dataChanged(mInputRow, mInputCol);
     }
 
     @Override
@@ -185,6 +191,15 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         initSpreadsheetCheck();
         mSubscription = mDst.register(sqlDataObserver);
         mDst.queryData(mRows, mColumns);
+    }
+
+
+    private void addToUndoStack(final String oldData, final int row, final int col) {
+        final TransactionHistory history = new TransactionHistory();
+        history.mRow = row;
+        history.mColumn = col;
+        history.mOldData = oldData;
+        history.save();
     }
 
     private void initSpreadsheetCheck() {
