@@ -1,6 +1,9 @@
 package com.adamgreenberg.headspace.presenter;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 /**
  * Created by adamgreenberg on 1/8/17.
@@ -74,6 +77,16 @@ public interface SpreadsheetPresenter {
      * @return instance of the adapter for the activity to display
      */
     SpreadsheetAdapter getAdapter();
+
+    /**
+     * Provides the {@link GridLayoutManager} for the spreadsheet
+     */
+    GridLayoutManager getGridLayoutManager(Context ctx);
+
+    /**
+     * Provides the ItemDecoration for the spreadsheet
+     */
+    RecyclerView.ItemDecoration getItemDecoration(Context ctx);
 
     /**
      * Hook called when the save instance state is about to die and needs to store the data
