@@ -9,10 +9,12 @@ import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransacti
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Notification;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.schedulers.Schedulers;
@@ -61,6 +63,19 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                 .orderBy(DataStore_Table.mColumn, true)
                 .async()
                 .queryResultCallback(this)
+                .execute();
+    }
+
+    public void restoreClearedData(final long timestamp, final int rows, final int columns) {
+        mBoundsObservable = Observable.just(new int[]{rows, columns});
+        mSaveDataObservable = null;
+        SQLite.select()
+                .from(ClearStack.class)
+                .where(ClearStack_Table.mClearTime.eq(timestamp))
+                .orderBy(ClearStack_Table.mRow, true)
+                .orderBy(ClearStack_Table.mColumn, true)
+                .async()
+                .queryResultCallback(clearStackQueryResultCallback)
                 .execute();
     }
 
@@ -198,6 +213,68 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                         }
 
                         return rowList;
+                    }
+                });
+    }
+
+    private QueryTransaction.QueryResultCallback<ClearStack> clearStackQueryResultCallback
+            = new QueryTransaction.QueryResultCallback<ClearStack>() {
+
+        @Override
+        public void onQueryResult(final QueryTransaction<ClearStack> transaction,
+                                  @NonNull final CursorResult<ClearStack> tResult) {
+            final List<ClearStack> clearStack = tResult.toListClose();
+            resetFromClear(clearStack);
+        }
+    };
+
+    private void resetFromClear(final List<ClearStack> clearStack) {
+        perform(parseAndEmitFromStack(clearStack));
+    }
+
+    private Observable<List<List<String>>> parseAndEmitFromStack(final List<ClearStack> data) {
+        return Observable.just(data)
+                .zipWith(mBoundsObservable, new Func2<List<ClearStack>, int[], List<List<String>>>() {
+                    @Override
+                    public List<List<String>> call(final List<ClearStack> clearStacks, final int[] bounds) {
+                        final int rows = bounds[0];
+                        final int columns = bounds[1];
+
+                        final List<List<String>> rowList = new ArrayList<>(rows);
+                        int dataStoresIndx = 0;
+
+                        // Build the matrix
+                        for (int r = 0; r < rows; r++) {
+                            // Init a new row
+                            final List<String> column = new ArrayList<>(columns);
+                            rowList.add(column);
+
+                            for (int c = 0; c < columns; c++) {
+                                // Intentionally kept separate for extensibility right now, but prob should combine types with DataStore
+                                final ClearStack ds = clearStacks.get(dataStoresIndx);
+
+                                if (ds.mColumn == c && ds.mRow == r) {
+                                    dataStoresIndx++;
+                                    column.add(ds.mData);
+                                } else {
+                                    column.add(null);
+                                }
+                            }
+                        }
+
+                        return rowList;
+                    }
+                })
+                .doOnEach(new Action1<Notification<? super List<List<String>>>>() {
+                    @Override
+                    public void call(final Notification<? super List<List<String>>> notification) {
+                        // Clear the data on the clear stack that corresponds for better data keeping practices
+                        final long time = data.get(0).mClearTime;
+
+                        SQLite.delete()
+                                .from(ClearStack.class)
+                                .where(ClearStack_Table.mClearTime.eq(time))
+                                .execute();
                     }
                 });
     }

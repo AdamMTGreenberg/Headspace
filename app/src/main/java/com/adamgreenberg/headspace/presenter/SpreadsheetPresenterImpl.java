@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.adamgreenberg.headspace.models.ClearStackTable;
+import com.adamgreenberg.headspace.models.ClearStack;
 import com.adamgreenberg.headspace.models.DataStore;
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
 import com.adamgreenberg.headspace.models.DataStore_Table;
@@ -291,6 +291,8 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         final TransactionHistory history = new TransactionHistory();
         history.mWasClear = true;
         history.mClearTime = time;
+        history.mRow = mRows;
+        history.mColumn = mColumns;
         history.save();
     }
 
@@ -312,12 +314,12 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
                                 for (final List<String> rows : lists) {
                                     int col = 0;
                                     for (final String columnData : rows) {
-                                        final ClearStackTable clearStackTable = new ClearStackTable();
-                                        clearStackTable.mClearTime = time;
-                                        clearStackTable.mRow = row;
-                                        clearStackTable.mColumn = col;
-                                        clearStackTable.mData = columnData;
-                                        clearStackTable.save();
+                                        final ClearStack clearStack = new ClearStack();
+                                        clearStack.mClearTime = time;
+                                        clearStack.mRow = row;
+                                        clearStack.mColumn = col;
+                                        clearStack.mData = columnData;
+                                        clearStack.save();
 
                                         col++;
                                     }
@@ -388,6 +390,8 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     }
 
     private void resetClearData(final TransactionHistory history) {
+        final long timestamp = history.mClearTime;
+        mDst.restoreClearedData(timestamp, history.mRow, history.mColumn);
     }
 
     private TransactionHistory getLastAction() {
@@ -447,6 +451,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         @Override
         public void onError(final Throwable e) {
             Timber.d(e, "Error fetching spreadsheet");
+            // Error on reset of a clear
         }
 
         @Override
