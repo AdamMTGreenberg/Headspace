@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.adamgreenberg.headspace.models.DataStore;
+import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
 import com.adamgreenberg.headspace.models.DataStore_Table;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
 import com.adamgreenberg.headspace.ui.SpreadsheetView;
 import com.raizlabs.android.dbflow.sql.language.CursorResult;
-import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
@@ -38,9 +38,15 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
      */
     private ArrayList<ArrayList<String>> mData;
 
+    /**
+     * SQL async helper
+     */
+    private DataStoreQueryTransaction mDst;
+
     public SpreadsheetPresenterImpl(final SpreadsheetView mainActivity) {
         mView = mainActivity;
         mAdapter = new SpreadsheetAdapter();
+        mDst = new DataStoreQueryTransaction();
     }
 
     @Override
@@ -116,7 +122,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
         mRows = info.mRowCount;
         mColumns = info.mColumnCount;
 
-        mData = getSpreadsheetData();
+        getSpreadsheetData();
     }
 
     private SpreadsheetInfo getInfo() {
@@ -137,21 +143,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
     }
 
     public void getSpreadsheetData() {
-        SQLite.select()
-                .from(DataStore.class)
-                .orderBy(DataStore_Table.mRow, true)
-                .orderBy(DataStore_Table.mColumn, true)
-                .async()
-                .queryResultCallback(new QueryTransaction.QueryResultCallback<DataStore>() {
-                    @Override
-                    public void onQueryResult(final QueryTransaction<DataStore> transaction,
-                                              @NonNull final CursorResult<DataStore> tResult) {
-                        final List<DataStore> data = tResult.toListClose();
 
-
-                    }
-
-                }).execute();
     }
 }
 
