@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.adamgreenberg.headspace.R;
 import com.adamgreenberg.headspace.models.CellViewHolder;
+import com.adamgreenberg.headspace.models.OnCellClickedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,9 @@ import static com.adamgreenberg.headspace.models.Spreadsheet.MIN_ROWS;
 public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
     private List<List<String>> mData;
+    private int mRowSpan = MIN_ROWS;
+    private int mColumnSpan = MIN_COLUMNS;
+    private OnCellClickedListener mOnCellClickedListener;
 
     public SpreadsheetAdapter() {
         mData = new ArrayList<>();
@@ -36,18 +40,43 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
     @Override
     public void onBindViewHolder(final CellViewHolder holder, final int position) {
+        if (!mData.isEmpty()) {
+            final int row = (int) (position / mColumnSpan);
+            final int col = position % mColumnSpan;
 
+            final String data = mData.get(row).get(col);
+            holder.data.setText(data);
+
+            holder.data.setOnClickListener(new CellClickListener(row, col));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mData.isEmpty() ? MIN_ROWS * MIN_COLUMNS : mData.size();
+        return mData.isEmpty() ? mRowSpan * mColumnSpan : mData.size();
     }
 
-    public void addRow() {
+    public void registerOnCellClickedListener(final OnCellClickedListener listener) {
+        mOnCellClickedListener = listener;
     }
 
-    public void addColumn() {
+    public void unregisterOnCellClickedListener() {
+        mOnCellClickedListener = null;
+    }
+
+    public void setRowSpan(final int span) {
+        if(mRowSpan != span) {
+            final int count = getItemCount();
+            mRowSpan = span;
+            notifyItemRangeInserted(count - 1, mColumnSpan);
+        }
+    }
+
+    public void setColumnSpan(final int span) {
+        if (span != mColumnSpan) {
+            mColumnSpan = span;
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -58,5 +87,23 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
     public void setData(final List<List<String>> data) {
         this.mData = data;
         notifyDataSetChanged();
+    }
+
+    private class CellClickListener implements View.OnClickListener {
+        final int row;
+        final int col;
+
+        public CellClickListener(final int row, final int col) {
+            this.row = row;
+            this.col = col;
+        }
+
+        @Override
+        public void onClick(final View v) {
+            v.clearFocus();
+            if (mOnCellClickedListener != null) {
+                mOnCellClickedListener.onCellClicked(row, col);
+            }
+        }
     }
 }

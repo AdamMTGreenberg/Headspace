@@ -12,7 +12,7 @@ import com.adamgreenberg.headspace.R;
 
 public class CellViewHolder extends RecyclerView.ViewHolder {
 
-    private EditText data;
+    public EditText data;
 
     public CellViewHolder(final View itemView) {
         super(itemView);
