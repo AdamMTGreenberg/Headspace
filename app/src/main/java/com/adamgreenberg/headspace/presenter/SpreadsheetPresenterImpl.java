@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
+import com.adamgreenberg.headspace.models.FixedGridLayoutManager;
 import com.adamgreenberg.headspace.models.Spreadsheet;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
 import com.adamgreenberg.headspace.ui.GridDividerDecoration;
@@ -29,7 +30,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
 
     private final SpreadsheetView mView;
     private final SpreadsheetAdapter mAdapter;
-    private GridLayoutManager mGridLayoutManager;
+    private FixedGridLayoutManager mGridLayoutManager;
     private RecyclerView.ItemDecoration mItemDecoration;
 
     /**
@@ -121,8 +122,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter {
     }
 
     @Override
-    public GridLayoutManager getGridLayoutManager(final Context ctx) {
-        mGridLayoutManager = new GridLayoutManager(ctx, mColumns);
+    public FixedGridLayoutManager getGridLayoutManager(final Context ctx) {
+        mGridLayoutManager = new FixedGridLayoutManager();
+        mGridLayoutManager.setTotalColumnCount(mColumns);
         return mGridLayoutManager;
     }
 
