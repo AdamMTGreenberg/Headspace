@@ -96,5 +96,4 @@ public interface SpreadsheetPresenter {
      * @param outState bundle containing data for
      */
     void saveInstance(Bundle outState);
-
 }

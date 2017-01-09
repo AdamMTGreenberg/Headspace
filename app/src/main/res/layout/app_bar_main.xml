@@ -43,10 +43,12 @@
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/add_column"
                 android:layout_toStartOf="@+id/add_column"
-                android:hint="@string/edit_cell"
-                android:minWidth="25sp"
                 android:gravity="start"
+                android:hint="@string/edit_cell"
+                android:imeOptions="actionDone"
+                android:inputType="text"
                 android:lines="1"
+                android:minWidth="25sp"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingStart="@dimen/activity_horizontal_margin"/>
 
