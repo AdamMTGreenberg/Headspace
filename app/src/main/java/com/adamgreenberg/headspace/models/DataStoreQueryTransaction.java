@@ -13,30 +13,32 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 
 /**
  * Created by adamgreenberg on 1/8/17.
- *
+ * <p>
  * Class that receives the DB results from the query
  */
 
 public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCallback<DataStore> {
 
-    private PublishSubject<ArrayList<ArrayList<String>>> mSubject;
+    private PublishSubject<List<List<String>>> mSubject;
+    private Observable<int[]> mBoundsObservable;
 
     public DataStoreQueryTransaction() {
         mSubject = PublishSubject.create();
     }
 
-    public Subscription register(Observer<ArrayList<ArrayList<String>>> observer) {
+    public Subscription register(Observer<List<List<String>>> observer) {
         return mSubject.subscribe(observer);
     }
 
-    public void query(){
+    public void queryData(final int rows, final int columns) {
+        mBoundsObservable = Observable.just(new int[]{rows, columns});
         SQLite.select()
                 .from(DataStore.class)
                 .orderBy(DataStore_Table.mRow, true)
@@ -55,15 +57,39 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
 
     private void parseAndEmit(final List<DataStore> data) {
         Observable.just(data)
-                .flatMap(new Func1<List<DataStore>, Observable<ArrayList<ArrayList<String>>>>() {
+                .zipWith(mBoundsObservable, new Func2<List<DataStore>, int[], List<List<String>>>() {
                     @Override
-                    public Observable<ArrayList<ArrayList<String>>> call(final List<DataStore> dataStores) {
-                        return null;
+                    public List<List<String>> call(final List<DataStore> dataStores, final int[] bounds) {
+                        final int rows = bounds[0];
+                        final int columns = bounds[1];
+
+                        final List<List<String>> rowList = new ArrayList<>(rows);
+                        int dataStoresIndx = 0;
+
+                        // Build the matrix
+                        for (int r = 0; r < rows; r++) {
+                            // Init a new row
+                            final List<String> column = new ArrayList<>(columns);
+                            rowList.add(column);
+
+                            for (int c = 0; c < columns; c++) {
+                                final DataStore ds = dataStores.get(dataStoresIndx);
+
+                                if (ds.mColumn == c && ds.mRow == r) {
+                                    dataStoresIndx++;
+                                    column.add(ds.mData);
+                                } else {
+                                    column.add(null);
+                                }
+                            }
+                        }
+
+                        return rowList;
                     }
                 })
                 .observeOn(Schedulers.newThread())
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<ArrayList<ArrayList<String>>>() {
+                .subscribe(new Observer<List<List<String>>>() {
 
                     @Override
                     public void onCompleted() {
@@ -78,7 +104,7 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                     }
 
                     @Override
-                    public void onNext(final ArrayList<ArrayList<String>> arrayLists) {
+                    public void onNext(final List<List<String>> arrayLists) {
                         mSubject.onNext(arrayLists);
                     }
 
