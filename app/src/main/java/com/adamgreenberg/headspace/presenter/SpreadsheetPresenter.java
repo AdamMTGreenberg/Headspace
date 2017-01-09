@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.adamgreenberg.headspace.models.FixedGridLayoutManager;
+
 /**
  * Created by adamgreenberg on 1/8/17.
  * Presenter contract for the business logic of the presenter class.
@@ -79,9 +81,9 @@ public interface SpreadsheetPresenter {
     SpreadsheetAdapter getAdapter();
 
     /**
-     * Provides the {@link GridLayoutManager} for the spreadsheet
+     * Provides the {@link FixedGridLayoutManager} for the spreadsheet
      */
-    GridLayoutManager getGridLayoutManager(Context ctx);
+    FixedGridLayoutManager getGridLayoutManager(Context ctx);
 
     /**
      * Provides the ItemDecoration for the spreadsheet

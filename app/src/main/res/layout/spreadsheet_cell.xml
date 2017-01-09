@@ -4,5 +4,5 @@
           android:layout_width="@dimen/grid_size"
           android:layout_height="@dimen/grid_size"
           android:layout_gravity="center"
-          android:layout_margin="@dimen/cell_margin"
+          android:padding="@dimen/cell_margin"
           android:gravity="center" />
