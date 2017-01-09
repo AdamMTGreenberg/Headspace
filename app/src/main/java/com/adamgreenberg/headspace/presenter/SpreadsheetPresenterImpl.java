@@ -13,6 +13,7 @@ import com.adamgreenberg.headspace.models.OnCellClickedListener;
 import com.adamgreenberg.headspace.models.Spreadsheet;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
 import com.adamgreenberg.headspace.models.TransactionHistory;
+import com.adamgreenberg.headspace.models.TransactionHistory_Table;
 import com.adamgreenberg.headspace.ui.GridDividerDecoration;
 import com.adamgreenberg.headspace.ui.SpreadsheetView;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -108,8 +109,21 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onFabClicked() {
-       // TODO read in the last action
+        // Read in the last action
+        final TransactionHistory history = getLastAction();
+        // Set the data according to the last action
+        if (history.mWasClear) {
+            resetClearData(history);
+        } else if(history.mColumnAdded != -1) {
+            resetColumn(history.mColumnAdded);
+        } else if(history.mRowAdded != -1) {
+            resetRow(history.mRowAdded);
+        } else {
+            resetData(history.mOldData, history.mRow, history.mColumn);
+        }
 
+        // Remove the last undo data from table
+        history.delete();
     }
 
     @Override
@@ -276,7 +290,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     private void addClearToUndoStack(final Long time) {
         final TransactionHistory history = new TransactionHistory();
         history.mWasClear = true;
-        history.mClearTime  = time;
+        history.mClearTime = time;
         history.save();
     }
 
@@ -290,9 +304,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
                                 return Observable.just(System.currentTimeMillis()); // For non production app, OK to assume non edge cases
                             }
                         }),
-                        new Func2<List<List<String>>, Long,  List<List<String>>>() {
+                        new Func2<List<List<String>>, Long, List<List<String>>>() {
                             @Override
-                            public  List<List<String>> call(final List<List<String>> lists, final Long time) {
+                            public List<List<String>> call(final List<List<String>> lists, final Long time) {
                                 int row = 0;
                                 // Add all the data to a stored table
                                 for (final List<String> rows : lists) {
@@ -312,7 +326,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
                                 // Create an empty list of data for backing the spreadsheet
                                 final List<List<String>> tempData = new ArrayList<>(mRows);
-                                for(int i = 0; i < mRows; i++) {
+                                for (int i = 0; i < mRows; i++) {
                                     final List<String> tempCol = new ArrayList<>(mColumns);
                                     for (int x = 0; x < mColumns; x++) {
                                         tempCol.add(null);
@@ -345,6 +359,44 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         mData.add(row);
     }
 
+    private void decrementColumn() {
+        final Iterator<List<String>> iter = mData.iterator();
+        while (iter.hasNext()) {
+            final List<String> col = iter.next();
+            col.remove(mColumns);
+        }
+        mColumns--;
+    }
+
+    private void resetData(final String oldData, final int row, final int column) {
+        mData.get(row).set(column, oldData);
+        mAdapter.dataChanged(row, column);
+    }
+
+    private void resetRow(final int rowAddedIndex) {
+        mData.remove(mRows);
+        mRows--;
+        mAdapter.setRowSpan(mRows);
+    }
+
+    private void resetColumn(final int columnAddedIndex) {
+        decrementColumn();
+
+        // Set the column value increased on the adapter
+        mGridLayoutManager.setTotalColumnCount(mColumns);
+        mAdapter.setColumnSpan(mColumns);
+    }
+
+    private void resetClearData(final TransactionHistory history) {
+    }
+
+    private TransactionHistory getLastAction() {
+        return SQLite.select()
+                .from(TransactionHistory.class)
+                .orderBy(TransactionHistory_Table.id, false)
+                .querySingle();
+    }
+
     private void addToUndoStack(final String oldData, final int row, final int col) {
         final TransactionHistory history = new TransactionHistory();
         history.mRow = row;
@@ -365,7 +417,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         if (count < Spreadsheet.MIN_COLUMNS * Spreadsheet.MIN_ROWS) {
             // Initialize with empty data
             for (int r = 0; r < Spreadsheet.MIN_ROWS; r++) {
-                for (int c = 0; c < Spreadsheet.MIN_COLUMNS ; c++) {
+                for (int c = 0; c < Spreadsheet.MIN_COLUMNS; c++) {
                     final DataStore ds = new DataStore();
                     ds.mColumn = c;
                     ds.mRow = r;
