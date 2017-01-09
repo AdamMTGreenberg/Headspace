@@ -82,7 +82,6 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                                     column.add(null);
                                 }
                             }
-                            rowList.add(column);
                         }
 
                         return rowList;

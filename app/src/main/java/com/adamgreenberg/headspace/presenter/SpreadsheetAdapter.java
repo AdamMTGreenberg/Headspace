@@ -55,7 +55,7 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mData.isEmpty() ? mRowSpan * mColumnSpan : mData.size();
+        return mRowSpan * mColumnSpan;
     }
 
     public void registerOnCellClickedListener(final OnCellClickedListener listener) {

@@ -222,6 +222,8 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         @Override
         public void onNext(final List<List<String>> lists) {
             mData = lists;
+            mAdapter.setRowSpan(mRows);
+            mAdapter.setColumnSpan(mColumns);
             mAdapter.setData(mData);
         }
     };
