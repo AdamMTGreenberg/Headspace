@@ -24,4 +24,10 @@ public class TransactionHistory extends BaseModel {
     @Column
     public String mOldData;
 
+    @Column
+    public boolean mWasColumnAdd = false;
+
+    @Column
+    public boolean mWasRowAdd = false;
+
 }

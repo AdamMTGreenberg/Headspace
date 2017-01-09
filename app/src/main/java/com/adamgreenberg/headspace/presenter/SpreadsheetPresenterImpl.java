@@ -16,6 +16,7 @@ import com.adamgreenberg.headspace.ui.GridDividerDecoration;
 import com.adamgreenberg.headspace.ui.SpreadsheetView;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import java.util.Iterator;
 import java.util.List;
 
 import rx.Observer;
@@ -107,7 +108,17 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void onAddColumnClicked() {
-// TODO
+        // Set the column value increased
+        mColumns++;
+
+        // Add a new null value to each row in the data set
+        addNullColumn();
+
+        // Set the column value increased on the adapter
+        mAdapter.setColumnSpan(mColumns);
+
+        // Notify the undo stack of a column add
+        addToUndoStack(false);
     }
 
     @Override
@@ -192,7 +203,24 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         mSubscription = mDst.register(sqlDataObserver);
         mDst.queryData(mRows, mColumns);
     }
+    
+    private void addToUndoStack(final boolean isRowAdd) {
+        final TransactionHistory history = new TransactionHistory();
+        if (isRowAdd) {
+            history.mWasRowAdd = true;
+        } else {
+            history.mWasColumnAdd = true;
+        }
+        history.save();
+    }
 
+    private void addNullColumn() {
+        final Iterator<List<String>> iter = mData.iterator();
+        while (iter.hasNext()) {
+            final List<String> col = iter.next();
+            col.add(null);
+        }
+    }
 
     private void addToUndoStack(final String oldData, final int row, final int col) {
         final TransactionHistory history = new TransactionHistory();
