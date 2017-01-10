@@ -425,6 +425,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         mRows = row;
         mColumns = col;
         setData(data);
+        mSubscription = mDst.register(sqlDataObserver);
     }
 
     private void initSpreadsheetCheck() {
