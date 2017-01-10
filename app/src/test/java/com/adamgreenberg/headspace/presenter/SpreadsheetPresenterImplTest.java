@@ -122,6 +122,56 @@ public class SpreadsheetPresenterImplTest {
         Assert.assertEquals(count, 0);
     }
 
+    @Test
+    public void textEntered() throws Exception {
+
+    }
+
+    @Test
+    public void onAddColumnClicked() throws Exception {
+
+    }
+
+    @Test
+    public void onAddRowClicked() throws Exception {
+
+    }
+
+    @Test
+    public void onSaveClicked() throws Exception {
+
+    }
+
+    @Test
+    public void onReloadClicked() throws Exception {
+
+    }
+
+    @Test
+    public void onClearClicked() throws Exception {
+
+    }
+
+    @Test
+    public void getAdapter() throws Exception {
+
+    }
+
+    @Test
+    public void getGridLayoutManager() throws Exception {
+
+    }
+
+    @Test
+    public void getItemDecoration() throws Exception {
+
+    }
+
+    @Test
+    public void onCellClicked() throws Exception {
+
+    }
+
     private SpreadsheetAdapter initTestAdapter(final List<ParcelableArrayList> data) {
         final SpreadsheetAdapter adapter = new SpreadsheetAdapter();
         adapter.setData(data);

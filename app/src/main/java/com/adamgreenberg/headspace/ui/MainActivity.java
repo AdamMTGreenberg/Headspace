@@ -52,6 +52,13 @@ public class MainActivity extends AppCompatActivity
         mPresenter = new SpreadsheetPresenterImpl(this);
         mPresenter.created(savedInstanceState);
         initSpreadSheetUi();
+
+        if (savedInstanceState == null) {
+            AlertDFragment alertdFragment = new AlertDFragment();
+            alertdFragment.setPresenter(mPresenter);
+            // Show Alert DialogFragment
+            alertdFragment.show(getSupportFragmentManager(), "Alert Dialog Fragment");
+        }
     }
 
     @Override
@@ -171,4 +178,5 @@ public class MainActivity extends AppCompatActivity
         mSpreadsheet.setLayoutManager(mPresenter.getGridLayoutManager(this));
         mSpreadsheet.addItemDecoration(mPresenter.getItemDecoration(this));
     }
+
 }
