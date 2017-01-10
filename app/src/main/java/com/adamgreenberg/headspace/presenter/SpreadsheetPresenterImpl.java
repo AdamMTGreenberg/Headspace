@@ -2,6 +2,7 @@ package com.adamgreenberg.headspace.presenter;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 
 import com.adamgreenberg.headspace.models.ClearStack;
@@ -41,6 +42,8 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     private static final int DEFAULT_COUNT = Spreadsheet.MIN_ROWS;
     private static final String KEY = "DATA_KEY";
+    private static final String COL_KEY = "COL_KEY";
+    private static final String ROW_KEY = "ROW_KEY";
 
     private final SpreadsheetView mView;
     private final SpreadsheetAdapter mAdapter;
@@ -228,7 +231,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void saveInstance(final Bundle outState) {
-        // TODO save the current data in memory
+        outState.putParcelableArrayList(KEY, (ArrayList<? extends Parcelable>) mData);
+        outState.putInt(COL_KEY, mColumns);
+        outState.putInt(ROW_KEY, mRows);
     }
 
     private void populateData() {
@@ -413,7 +418,13 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     }
 
     private void restoreData(final Bundle savedInstanceState) {
-        // TODO
+        final List<ParcelableArrayList> data = savedInstanceState.getParcelableArrayList(KEY);
+        final int row = savedInstanceState.getInt(ROW_KEY);
+        final int col = savedInstanceState.getInt(COL_KEY);
+
+        mRows = row;
+        mColumns = col;
+        setData(data);
     }
 
     private void initSpreadsheetCheck() {
