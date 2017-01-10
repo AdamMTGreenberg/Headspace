@@ -3,6 +3,7 @@ package com.adamgreenberg.headspace.presenter;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.widget.RecyclerView;
 
 import com.adamgreenberg.headspace.models.ClearStack;
@@ -46,7 +47,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     private static final String ROW_KEY = "ROW_KEY";
 
     private final SpreadsheetView mView;
-    private final SpreadsheetAdapter mAdapter;
+    private SpreadsheetAdapter mAdapter;
     private FixedGridLayoutManager mGridLayoutManager;
     private RecyclerView.ItemDecoration mItemDecoration;
 
@@ -474,5 +475,14 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
             setData(lists);
         }
     };
+
+    @VisibleForTesting
+    void setData(final List<ParcelableArrayList> lists, final int row, final int column,
+                 final SpreadsheetAdapter adapter) {
+        mData = lists;
+        mRows = row;
+        mColumns = column;
+        mAdapter = adapter;
+    }
 }
 
