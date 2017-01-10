@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.adamgreenberg.headspace.R;
 import com.adamgreenberg.headspace.models.CellViewHolder;
 import com.adamgreenberg.headspace.models.OnCellClickedListener;
+import com.adamgreenberg.headspace.models.ParcelableArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import static com.adamgreenberg.headspace.models.Spreadsheet.MIN_ROWS;
 
 public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
-    private List<List<String>> mData;
+    private List<ParcelableArrayList> mData;
     private int mRowSpan = MIN_ROWS;
     private int mColumnSpan = MIN_COLUMNS;
     private OnCellClickedListener mOnCellClickedListener;
@@ -88,7 +89,7 @@ public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
      *
      * @param data data that is used for the backing of the spreadsheet
      */
-    public void setData(final List<List<String>> data) {
+    public void setData(final List<ParcelableArrayList> data) {
         this.mData = data;
         notifyDataSetChanged();
     }

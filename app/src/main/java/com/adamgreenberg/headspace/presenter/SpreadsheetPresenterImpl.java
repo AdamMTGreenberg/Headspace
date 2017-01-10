@@ -10,6 +10,7 @@ import com.adamgreenberg.headspace.models.DataStoreQueryTransaction;
 import com.adamgreenberg.headspace.models.DataStore_Table;
 import com.adamgreenberg.headspace.models.FixedGridLayoutManager;
 import com.adamgreenberg.headspace.models.OnCellClickedListener;
+import com.adamgreenberg.headspace.models.ParcelableArrayList;
 import com.adamgreenberg.headspace.models.Spreadsheet;
 import com.adamgreenberg.headspace.models.SpreadsheetInfo;
 import com.adamgreenberg.headspace.models.TransactionHistory;
@@ -39,6 +40,7 @@ import timber.log.Timber;
 public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellClickedListener {
 
     private static final int DEFAULT_COUNT = Spreadsheet.MIN_ROWS;
+    private static final String KEY = "DATA_KEY";
 
     private final SpreadsheetView mView;
     private final SpreadsheetAdapter mAdapter;
@@ -54,7 +56,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     /**
      * We use this so we can dynamically control the data backing the spreadsheet.
      */
-    private List<List<String>> mData;
+    private List<ParcelableArrayList> mData;
 
     /**
      * SQL async helper
@@ -81,7 +83,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
 
     @Override
     public void created(final Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null || !savedInstanceState.containsKey(KEY)) {
             populateData();
         } else {
             restoreData(savedInstanceState);
@@ -296,7 +298,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         history.save();
     }
 
-    private Subscription addToClearStack(final List<List<String>> data) {
+    private Subscription addToClearStack(final List<ParcelableArrayList> data) {
         return Observable.just(data)
                 .zipWith(
                         Observable.defer(new Func0<Observable<Long>>() {
@@ -306,12 +308,12 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
                                 return Observable.just(System.currentTimeMillis()); // For non production app, OK to assume non edge cases
                             }
                         }),
-                        new Func2<List<List<String>>, Long, List<List<String>>>() {
+                        new Func2<List<ParcelableArrayList>, Long, List<ParcelableArrayList>>() {
                             @Override
-                            public List<List<String>> call(final List<List<String>> lists, final Long time) {
+                            public List<ParcelableArrayList> call(final List<ParcelableArrayList> lists, final Long time) {
                                 int row = 0;
                                 // Add all the data to a stored table
-                                for (final List<String> rows : lists) {
+                                for (final ParcelableArrayList rows : lists) {
                                     int col = 0;
                                     for (final String columnData : rows) {
                                         final ClearStack clearStack = new ClearStack();
@@ -327,9 +329,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
                                 }
 
                                 // Create an empty list of data for backing the spreadsheet
-                                final List<List<String>> tempData = new ArrayList<>(mRows);
+                                final List<ParcelableArrayList> tempData = new ArrayList<>(mRows);
                                 for (int i = 0; i < mRows; i++) {
-                                    final List<String> tempCol = new ArrayList<>(mColumns);
+                                    final ParcelableArrayList tempCol = new ParcelableArrayList(mColumns);
                                     tempData.add(tempCol);
                                     for (int x = 0; x < mColumns; x++) {
                                         tempCol.add(null);
@@ -347,15 +349,15 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     }
 
     private void addNullColumn() {
-        final Iterator<List<String>> iter = mData.iterator();
+        final Iterator<ParcelableArrayList> iter = mData.iterator();
         while (iter.hasNext()) {
-            final List<String> col = iter.next();
+            final ParcelableArrayList col = iter.next();
             col.add(null);
         }
     }
 
     private void addNullRow() {
-        final List<String> row = new ArrayList<>(mColumns);
+        final ParcelableArrayList row = new ParcelableArrayList(mColumns);
         for (int i = 0; i < mColumns; i++) {
             row.add(null);
         }
@@ -363,9 +365,9 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     }
 
     private void decrementColumn() {
-        final Iterator<List<String>> iter = mData.iterator();
+        final Iterator<ParcelableArrayList> iter = mData.iterator();
         while (iter.hasNext()) {
-            final List<String> col = iter.next();
+            final ParcelableArrayList col = iter.next();
             col.remove(mColumns - 1);
         }
         mColumns--;
@@ -433,7 +435,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         }
     }
 
-    private void setData(final List<List<String>> lists) {
+    private void setData(final List<ParcelableArrayList> lists) {
         mData = lists;
         mAdapter.setRowSpan(mRows);
         mAdapter.setColumnSpan(mColumns);
@@ -443,7 +445,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
     /**
      * Spreadsheet data observer
      */
-    private Observer<List<List<String>>> sqlDataObserver = new Observer<List<List<String>>>() {
+    private Observer<List<ParcelableArrayList>> sqlDataObserver = new Observer<List<ParcelableArrayList>>() {
 
         @Override
         public void onCompleted() {
@@ -456,7 +458,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         }
 
         @Override
-        public void onNext(final List<List<String>> lists) {
+        public void onNext(final List<ParcelableArrayList> lists) {
             setData(lists);
         }
     };

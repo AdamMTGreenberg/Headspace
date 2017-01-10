@@ -29,15 +29,15 @@ import rx.subjects.PublishSubject;
 
 public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCallback<DataStore> {
 
-    private PublishSubject<List<List<String>>> mSubject;
+    private PublishSubject<List<ParcelableArrayList>> mSubject;
     private Observable<int[]> mBoundsObservable;
-    private Observable<List<List<String>>> mSaveDataObservable;
+    private Observable<List<ParcelableArrayList>> mSaveDataObservable;
 
     public DataStoreQueryTransaction() {
         mSubject = PublishSubject.create();
     }
 
-    public Subscription register(Observer<List<List<String>>> observer) {
+    public Subscription register(Observer<List<ParcelableArrayList>> observer) {
         return mSubject.subscribe(observer);
     }
 
@@ -86,7 +86,7 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
      * @param rows    number of rows
      * @param columns number of columns
      */
-    public void save(final List<List<String>> data, final int rows, final int columns) {
+    public void save(final List<ParcelableArrayList> data, final int rows, final int columns) {
         mBoundsObservable = Observable.just(new int[]{rows, columns});
         mSaveDataObservable = Observable.just(data);
 
@@ -111,11 +111,11 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
         }
     }
 
-    private void perform(final Observable<List<List<String>>> listObservable) {
+    private void perform(final Observable<List<ParcelableArrayList>> listObservable) {
         listObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(new Observer<List<List<String>>>() {
+                .subscribe(new Observer<List<ParcelableArrayList>>() {
 
                     @Override
                     public void onCompleted() {
@@ -130,21 +130,21 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                     }
 
                     @Override
-                    public void onNext(final List<List<String>> arrayLists) {
+                    public void onNext(final List<ParcelableArrayList> arrayLists) {
                         mSubject.onNext(arrayLists);
                     }
                 });
     }
 
-    private Observable<List<List<String>>> parseAndSaveData(final List<DataStore> data) {
+    private Observable<List<ParcelableArrayList>> parseAndSaveData(final List<DataStore> data) {
         return Observable.zip(
                 Observable.just(data),
                 mBoundsObservable,
                 mSaveDataObservable,
-                new Func3<List<DataStore>, int[], List<List<String>>, List<List<String>>>() {
+                new Func3<List<DataStore>, int[], List<ParcelableArrayList>, List<ParcelableArrayList>>() {
                     @Override
-                    public List<List<String>> call(final List<DataStore> dataStores, final int[] bounds,
-                                                   final List<List<String>> saveData) {
+                    public List<ParcelableArrayList> call(final List<DataStore> dataStores, final int[] bounds,
+                                                   final List<ParcelableArrayList> saveData) {
                         final int rows = bounds[0];
                         final int columns = bounds[1];
                         int dataStoresIndx = 0;
@@ -183,21 +183,21 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
 
     }
 
-    private Observable<List<List<String>>> parseAndEmit(final List<DataStore> data) {
+    private Observable<List<ParcelableArrayList>> parseAndEmit(final List<DataStore> data) {
         return Observable.just(data)
-                .zipWith(mBoundsObservable, new Func2<List<DataStore>, int[], List<List<String>>>() {
+                .zipWith(mBoundsObservable, new Func2<List<DataStore>, int[], List<ParcelableArrayList>>() {
                     @Override
-                    public List<List<String>> call(final List<DataStore> dataStores, final int[] bounds) {
+                    public List<ParcelableArrayList> call(final List<DataStore> dataStores, final int[] bounds) {
                         final int rows = bounds[0];
                         final int columns = bounds[1];
 
-                        final List<List<String>> rowList = new ArrayList<>(rows);
+                        final List<ParcelableArrayList> rowList = new ArrayList<>(rows);
                         int dataStoresIndx = 0;
 
                         // Build the matrix
                         for (int r = 0; r < rows; r++) {
                             // Init a new row
-                            final List<String> column = new ArrayList<>(columns);
+                            final ParcelableArrayList column = new ParcelableArrayList(columns);
                             rowList.add(column);
 
                             for (int c = 0; c < columns; c++) {
@@ -232,21 +232,21 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
         perform(parseAndEmitFromStack(clearStack));
     }
 
-    private Observable<List<List<String>>> parseAndEmitFromStack(final List<ClearStack> data) {
+    private Observable<List<ParcelableArrayList>> parseAndEmitFromStack(final List<ClearStack> data) {
         return Observable.just(data)
-                .zipWith(mBoundsObservable, new Func2<List<ClearStack>, int[], List<List<String>>>() {
+                .zipWith(mBoundsObservable, new Func2<List<ClearStack>, int[], List<ParcelableArrayList>>() {
                     @Override
-                    public List<List<String>> call(final List<ClearStack> clearStacks, final int[] bounds) {
+                    public List<ParcelableArrayList> call(final List<ClearStack> clearStacks, final int[] bounds) {
                         final int rows = bounds[0];
                         final int columns = bounds[1];
 
-                        final List<List<String>> rowList = new ArrayList<>(rows);
+                        final List<ParcelableArrayList> rowList = new ArrayList<>(rows);
                         int dataStoresIndx = 0;
 
                         // Build the matrix
                         for (int r = 0; r < rows; r++) {
                             // Init a new row
-                            final List<String> column = new ArrayList<>(columns);
+                            final ParcelableArrayList column = new ParcelableArrayList(columns);
                             rowList.add(column);
 
                             for (int c = 0; c < columns; c++) {
@@ -265,9 +265,9 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                         return rowList;
                     }
                 })
-                .doOnEach(new Action1<Notification<? super List<List<String>>>>() {
+                .doOnEach(new Action1<Notification<? super List<ParcelableArrayList>>>() {
                     @Override
-                    public void call(final Notification<? super List<List<String>>> notification) {
+                    public void call(final Notification<? super List<ParcelableArrayList>> notification) {
                         // Clear the data on the clear stack that corresponds for better data keeping practices
                         final long time = data.get(0).mClearTime;
 
