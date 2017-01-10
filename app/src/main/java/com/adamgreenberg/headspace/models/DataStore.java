@@ -36,4 +36,11 @@ public class DataStore extends BaseModel {
      */
     @Column(defaultValue = "1")
     public int mIsShowing;
+
+    public static DataStore empty() {
+        final DataStore ds = new DataStore();
+        ds.mRow = Integer.MIN_VALUE;
+        ds.mColumn = Integer.MIN_VALUE;
+        return ds;
+    }
 }

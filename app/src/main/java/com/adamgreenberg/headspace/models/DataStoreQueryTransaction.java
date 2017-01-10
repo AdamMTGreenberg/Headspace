@@ -148,6 +148,7 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                         final int rows = bounds[0];
                         final int columns = bounds[1];
                         int dataStoresIndx = 0;
+                        final int ceil = dataStores.size();
 
                         // FIXME fix update for save or row+/column+ and then undo and save
 
@@ -155,7 +156,8 @@ public class DataStoreQueryTransaction implements QueryTransaction.QueryResultCa
                         for (int r = 0; r < rows; r++) {
                             for (int c = 0; c < columns; c++) {
                                 final String spreadsheetData = saveData.get(r).get(c);
-                                final DataStore storedData = dataStores.get(dataStoresIndx);
+                                final DataStore storedData = (dataStoresIndx >= ceil)
+                                        ? DataStore.empty() : dataStores.get(dataStoresIndx);
 
                                 if (storedData.mRow == r && storedData.mColumn == c) {
                                     // Increment the next position in the queue
