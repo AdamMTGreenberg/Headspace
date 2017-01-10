@@ -484,5 +484,10 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
         mColumns = column;
         mAdapter = adapter;
     }
+
+    @VisibleForTesting
+    void setGridLayoutManager(final FixedGridLayoutManager manager) {
+        mGridLayoutManager = manager;
+    }
 }
 

@@ -23,9 +23,10 @@ import static com.adamgreenberg.headspace.models.Spreadsheet.MIN_ROWS;
 
 public class SpreadsheetAdapter extends RecyclerView.Adapter<CellViewHolder> {
 
-    private List<ParcelableArrayList> mData;
-    private int mRowSpan = MIN_ROWS;
-    private int mColumnSpan = MIN_COLUMNS;
+    List<ParcelableArrayList> mData;
+    int mRowSpan = MIN_ROWS;
+    int mColumnSpan = MIN_COLUMNS;
+
     private OnCellClickedListener mOnCellClickedListener;
 
     public SpreadsheetAdapter() {
