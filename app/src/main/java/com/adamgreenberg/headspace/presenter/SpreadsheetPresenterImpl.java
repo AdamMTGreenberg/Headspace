@@ -330,6 +330,7 @@ public class SpreadsheetPresenterImpl implements SpreadsheetPresenter, OnCellCli
                                 final List<List<String>> tempData = new ArrayList<>(mRows);
                                 for (int i = 0; i < mRows; i++) {
                                     final List<String> tempCol = new ArrayList<>(mColumns);
+                                    tempData.add(tempCol);
                                     for (int x = 0; x < mColumns; x++) {
                                         tempCol.add(null);
                                     }
